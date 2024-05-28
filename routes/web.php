@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\RuasJalanController;
+use App\Http\Controllers\MapController;
+
 
 Route::get('/', function () {
     return view('auth.login');
@@ -31,16 +32,10 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/dashboard/ruasjalan', [DashboardController::class, 'getRuasJalan'])->name('dashboard.ruasjalan');
 
 
-Route::post('/ruasjalan', [RuasJalanController::class, 'store'])->name('ruasjalan.store');
+Route::get('/form', function () {
+    return view('map.form');
+})->name('form');
+
+Route::post('/form', [MapController::class, 'postRuasJalan'])->name('ruasjalan.store');
 
 
-// Route::group(['middleware' => ['web', 'redirect.unauthenticated']], function () {
-//     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-// });
-
-
-
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-//     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-// });

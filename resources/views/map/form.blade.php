@@ -57,7 +57,7 @@
             <div class="section-title">
                 <h2>Input New Marker</h2>
             </div>
-            <form method="post" action="{{route('dashboard')}}">
+            <form id="markerForm">
                 @csrf
                 <div class="mb-3">
                     <label for="kode_ruas" class="form-label">Kode Ruas</label>
@@ -76,6 +76,24 @@
                     <input type="number" step="0.01" class="form-control" id="lebar" name="lebar" required>
                 </div>
                 <div class="mb-3">
+                    <label for="provinsi" class="form-label">Provinsi</label>
+                    <select id="provinsi" class="form-control" required>
+                        <option value="">Pilih Provinsi</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="kabupaten" class="form-label">Kabupaten</label>
+                    <select id="kabupaten" class="form-control" required>
+                        <option value="">Pilih Kabupaten</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="kecamatan" class="form-label">Kecamatan</label>
+                    <select id="kecamatan" class="form-control" required>
+                        <option value="">Pilih Kecamatan</option>
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label for="eksisting_id" class="form-label">Eksisting ID</label>
                     <input type="number" class="form-control" id="eksisting_id" name="eksisting_id" required>
                 </div>
@@ -91,28 +109,23 @@
                     <label for="keterangan" class="form-label">Keterangan</label>
                     <input type="text" class="form-control" id="keterangan" name="keterangan" required>
                 </div>
-                <button id="saveButton" class="btn btn-primary">Save Polyline</button>
+                <button type="button" id="saveButton" class="btn btn-primary">Save Polyline</button>
             </form>
         </div>
-    </main> <!-- End #main -->
-
-
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.min.js"></script>
+    </main><!-- End #main -->
+    
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
     <script>
-        // Menampilkan peta
         var mymap = L.map('mapid').setView([-8.790008703311203, 115.16780687368956], 13);
     
-        // Map layer
         var mapbiasa = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
             maxZoom: 18,
         }).addTo(mymap);
     
-        // Polyline related variables
         var polylinePoints = [];
         var polyline = L.polyline(polylinePoints, {color: 'red'}).addTo(mymap);
     
-        // Tambahkan event listener click pada peta untuk membuat polyline
         mymap.on('click', function(e) {
             polylinePoints.push([e.latlng.lat, e.latlng.lng]);
             polyline.setLatLngs(polylinePoints);
@@ -122,7 +135,6 @@
                 .openOn(mymap);
         });
     
-        // Function to encode polyline
         function encodePolyline(points) {
             let encoded = '';
             let prevLat = 0, prevLng = 0;
@@ -153,46 +165,55 @@
             encoded += String.fromCharCode(num + 63);
             return encoded;
         }
-    
+
+        // Function to fetch and populate dropdowns
+        function populateDropdown(endpoint, dropdownElement, keyName) {
+            fetch(endpoint)
+                .then(response => response.json())
+                .then(data => {
+                    dropdownElement.innerHTML = '<option value="">Pilih ' + keyName + '</option>';
+                    data.forEach(item => {
+                        dropdownElement.innerHTML += '<option value="' + item.id + '">' + item[keyName] + '</option>';
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Populate Provinsi dropdown
+        populateDropdown('https://gisapis.manpits.xyz/api/provinsi/1', document.getElementById('provinsi'), 'provinsi');
+
+        // Event listener for Provinsi dropdown change
+        document.getElementById('provinsi').addEventListener('change', function () {
+            var provinsiId = this.value;
+            var kabupatenDropdown = document.getElementById('kabupaten');
+            populateDropdown('https://gisapis.manpits.xyz/api/kabupaten/' + provinsiId, kabupatenDropdown, 'kabupaten');
+        });
+
+        // Event listener for Kabupaten dropdown change
+        document.getElementById('kabupaten').addEventListener('change', function () {
+            var kabupatenId = this.value;
+            var kecamatanDropdown = document.getElementById('kecamatan');
+            populateDropdown('https://gisapis.manpits.xyz/api/kecamatan/' + kabupatenId, kecamatanDropdown, 'kecamatan');
+        });
+
         // Function to save polyline
         function savePolyline() {
             if (polylinePoints.length < 2) {
                 alert('Please create at least two points to form a polyline.');
                 return;
             }
-    
+
             let paths = encodePolyline(polylinePoints);
-            let desa_id = document.getElementById('desa_id').value;
-            let kode_ruas = document.getElementById('kode_ruas').value;
-            let nama_ruas = document.getElementById('nama_ruas').value;
-            let panjang = document.getElementById('panjang').value;
-            let lebar = document.getElementById('lebar').value;
-            let eksisting_id = document.getElementById('eksisting_id').value;
-            let kondisi_id = document.getElementById('kondisi_id').value;
-            let jenisjalan_id = document.getElementById('jenisjalan_id').value;
-            let keterangan = document.getElementById('keterangan').value;
-    
-            let data = {
-                paths: paths,
-                desa_id: desa_id,
-                kode_ruas: kode_ruas,
-                nama_ruas: nama_ruas,
-                panjang: panjang,
-                lebar: lebar,
-                eksisting_id: eksisting_id,
-                kondisi_id: kondisi_id,
-                jenisjalan_id: jenisjalan_id,
-                keterangan: keterangan
-            };
-    
+            let formData = new FormData(document.getElementById('markerForm'));
+            formData.append('paths', paths);
+
             fetch('{{ route('ruasjalan.store') }}', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify(data)
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
@@ -203,42 +224,10 @@
                 console.error('Error:', error);
             });
         }
-    
-        // Add event listener to the save button
+
         document.getElementById('saveButton').addEventListener('click', savePolyline);
     </script>
 
-
-  <!-- ======= Footer ======= -->
-  <footer id="footer" class="footer">
-
-    <div class="container">
-      <div class="row gy-4">
-        <div class="col-lg-5 col-md-12 footer-info">
-          <a href="index.html" class="logo d-flex align-items-center">
-            <span>Krisna Juniartha</span>
-          </a>
-        
-          <div class="social-links d-flex mt-4">
-            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-          </div>
-        </div>
-
-  
-      </div>
-    </div>
-
-    <div class="container mt-4">
-      <div class="copyright">
-        &copy; Copyright <strong><span>Logis</span></strong>. All Rights Reserved
-      </div>
-    
-    </div>
-
-  </footer><!-- End Footer -->
 
   <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -256,6 +245,12 @@
   <!-- Template Main JS File -->
   <script src="{{ asset('frontend/js/main.js') }}"></script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var apiToken = "{{ Session::get('api_token') }}";
+        console.log('API Token:', apiToken);
+    });
+  </script>
 
 </body>
 

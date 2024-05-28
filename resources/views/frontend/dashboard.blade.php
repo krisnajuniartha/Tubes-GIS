@@ -48,45 +48,49 @@
   <!-- ======= Header ======= -->
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+        <a href="index.html" class="logo d-flex align-items-center">
+            <h1>Ruas Jalan GIS</h1>
+        </a>
 
-      <a href="index.html" class="logo d-flex align-items-center">
-        <h1>Ruas Jalan GIS</h1>
-      </a>
+        <div class="d-flex align-items-center">
+          <!-- Link yang mengarah ke form -->
+          <a href="{{ route('form') }}" >
+            <h1>Add Jalan</h1>
+          </a>
+        </div>
+        
 
-      <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
-      <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
-      <nav id="navbar" class="navbar">
-        <li class="nav-item dropdown pe-3">
+        <i class="mobile-nav-toggle mobile-nav-show bi bi-list"><span>Add Jalan</span></i>
+        <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+        <nav id="navbar" class="navbar">
+            <li class="nav-item dropdown pe-3">
+                <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <img src="{{ asset('frontend/img/krisnaa.jpg') }}" alt="Profile" class="rounded-circle img-thumbnail" style="width: 40px; height: 40px;">
+                    <span class="d-none d-md-block dropdown-toggle ps-2">User</span>
+                </a><!-- End Profile Image Icon -->
 
-          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="{{ asset('frontend/img/krisnaa.jpg') }}" alt="Profile" class="rounded-circle img-thumbnail" style="width: 40px; height: 40px;">
-            <span class="d-none d-md-block dropdown-toggle ps-2">User</span>
-          </a><!-- End Profile Iamge Icon -->
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <li class="dropdown-header">
-              <h6>Krisna</h6>
-              <span>Web Designer</span>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-                <a class="dropdown-item d-flex align-items-center" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="bi bi-box-arrow-right"></i>
-                    <span>Sign Out</span>
-                </a>
-            </li>
-
-          </ul><!-- End Profile Dropdown Items -->
-        </li><!-- End Profile Nav -->
-      </nav><!-- .navbar -->
-
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                    <li class="dropdown-header">
+                        <h6>Krisna</h6>
+                        <span>Web Designer</span>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                        <a class="dropdown-item d-flex align-items-center" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Sign Out</span>
+                        </a>
+                    </li>
+                </ul><!-- End Profile Dropdown Items -->
+            </li><!-- End Profile Nav -->
+        </nav><!-- .navbar -->
     </div>
-  </header><!-- End Header -->
+</header><!-- End Header -->
 
   <!-- ======= Hero Section ======= -->
   <section id="hero" class="d-flex flex-column justify-content-center align-items-center">
@@ -105,57 +109,58 @@
         <button id="getRuasJalanButton" class="btn btn-primary mt-3">Get Ruas Jalan</button>
     </div>
 </main>
+
 <script>
-  var mymap = L.map('mapid').setView([-8.790008703311203, 115.16780687368956], 13);
-  var mapbiasa = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
-      maxZoom: 18,
-  }).addTo(mymap);
-  var polylinePoints = [];
-  var polyline = L.polyline(polylinePoints, {color: 'red'}).addTo(mymap);
-  mymap.on('click', function(e) {
-      polylinePoints.push([e.latlng.lat, e.latlng.lng]);
-      polyline.setLatLngs(polylinePoints);
-      L.marker([e.latlng.lat, e.latlng.lng], {
-          icon: L.icon({
-              iconUrl: 'frontend/img/location.png',
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-              popupAnchor: [1, -34],
-              shadowSize: [41, 41]
-          })
-      }).addTo(mymap);
-  });
-  document.getElementById('getRuasJalanButton').addEventListener('click', function() {
-    var apiToken = "{{ Session::get('api_token') }}";
-    fetch("{{ route('dashboard.ruasjalan') }}", {
-        headers: {
-            'Authorization': 'Bearer ' + apiToken
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            data.ruasjalan.forEach(ruas => {
-                let paths = ruas.paths;
-                let coordinates = decodePolyline(paths);
-                L.polyline(coordinates, { color: 'blue' }).addTo(mymap);
-            });
-        } else {
-            console.error('Failed to fetch ruas jalan data:', data);
-        }
-    })
-    .catch(error => console.error('Error fetching data:', error));
-});
+    var mymap = L.map('mapid').setView([-8.790008703311203, 115.16780687368956], 13);
+    var mapbiasa = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+        maxZoom: 18,
+    }).addTo(mymap);
 
-function decodePolyline(encoded) {
-    // Gunakan library polyline untuk mendekode polyline
-    var polyline = L.polyline.fromEncoded(encoded).getLatLngs();
-    return polyline;
-}
+    var polylinePoints = [];
+    var polyline = L.polyline(polylinePoints, { color: 'red' }).addTo(mymap);
+    
+    mymap.on('click', function(e) {
+        polylinePoints.push([e.latlng.lat, e.latlng.lng]);
+        polyline.setLatLngs(polylinePoints);
+        L.marker([e.latlng.lat, e.latlng.lng], {
+            icon: L.icon({
+                iconUrl: 'frontend/img/location.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            })
+        }).addTo(mymap);
+    });
 
+    document.getElementById('getRuasJalanButton').addEventListener('click', function() {
+        var apiToken = "{{ Session::get('api_token') }}";
+        fetch("https://gisapis.manpits.xyz/api/ruasjalan", {
+            headers: {
+                'Authorization': 'Bearer ' + apiToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('API Response:', data);
+            if (data.status === 'success') {
+                data.ruasjalan.forEach(ruas => {
+                    console.log('Processing ruas:', ruas);
+                    let coordinates = ruas.decoded_paths;
+                    if (coordinates && coordinates.length > 0 && coordinates[0].length === 2) {
+                        L.polyline(coordinates, { color: 'blue' }).addTo(mymap);
+                    } else {
+                        console.error('Invalid coordinates:', coordinates);
+                    }
+                });
+            } else {
+                console.error('Failed to fetch ruas jalan data:', data);
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    });
 </script>
-
 <!-- End #main -->
 
   <!-- ======= Footer ======= -->
