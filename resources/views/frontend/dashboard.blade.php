@@ -119,20 +119,20 @@
 
     var polylinePoints = [];
     var polyline = L.polyline(polylinePoints, { color: 'red' }).addTo(mymap);
-    
-    mymap.on('click', function(e) {
-        polylinePoints.push([e.latlng.lat, e.latlng.lng]);
-        polyline.setLatLngs(polylinePoints);
-        L.marker([e.latlng.lat, e.latlng.lng], {
-            icon: L.icon({
-                iconUrl: 'frontend/img/location.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            })
-        }).addTo(mymap);
-    });
+
+    // mymap.on('click', function(e) {
+    //     polylinePoints.push([e.latlng.lat, e.latlng.lng]);
+    //     polyline.setLatLngs(polylinePoints);
+    //     L.marker([e.latlng.lat, e.latlng.lng], {
+    //         icon: L.icon({
+    //             iconUrl: 'frontend/img/location.png',
+    //             iconSize: [25, 41],
+    //             iconAnchor: [12, 41],
+    //             popupAnchor: [1, -34],
+    //             shadowSize: [41, 41]
+    //         })
+    //     }).addTo(mymap);
+    // });
 
     document.getElementById('getRuasJalanButton').addEventListener('click', function() {
         var apiToken = "{{ Session::get('api_token') }}";
@@ -147,9 +147,17 @@
             if (data.status === 'success') {
                 data.ruasjalan.forEach(ruas => {
                     console.log('Processing ruas:', ruas);
-                    let coordinates = ruas.decoded_paths;
+                    let coordinates = decodePolyline(ruas.paths);
+                    console.log('Coordinates:', ruas.paths);
+
                     if (coordinates && coordinates.length > 0 && coordinates[0].length === 2) {
-                        L.polyline(coordinates, { color: 'blue' }).addTo(mymap);
+                        let polyline = L.polyline(coordinates, { color: 'blue' }).addTo(mymap);
+                        polyline.on('click', function(e) {
+                            L.popup()
+                                .setLatLng(e.latlng)
+                                .setContent(`<b>${ruas.nama_ruas}</b><br>${ruas.keterangan}`)
+                                .openOn(mymap);
+                        });
                     } else {
                         console.error('Invalid coordinates:', coordinates);
                     }
@@ -160,6 +168,45 @@
         })
         .catch(error => console.error('Error fetching data:', error));
     });
+
+    function decodePolyline(encoded) {
+        var currentPosition = 0;
+        var currentLat = 0;
+        var currentLng = 0;
+        var dataLength = encoded.length;
+        var polyline = [];
+
+        while (currentPosition < dataLength) {
+            var shift = 0;
+            var result = 0;
+            var byte = null;
+
+            do {
+                byte = encoded.charCodeAt(currentPosition++) - 63;
+                result |= (byte & 0x1f) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
+
+            var deltaLat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+            currentLat += deltaLat;
+
+            shift = 0;
+            result = 0;
+
+            do {
+                byte = encoded.charCodeAt(currentPosition++) - 63;
+                result |= (byte & 0x1f) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
+
+            var deltaLng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+            currentLng += deltaLng;
+
+            polyline.push([currentLat * 1e-5, currentLng * 1e-5]);
+        }
+
+        return polyline;
+    }
 </script>
 <!-- End #main -->
 
