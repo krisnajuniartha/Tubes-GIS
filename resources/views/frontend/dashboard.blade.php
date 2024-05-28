@@ -38,6 +38,9 @@
   <link href="{{ asset('frontend/vendor/aos/aos.css') }}" rel="stylesheet">
   <link href="{{ asset('frontend/css/main.css') }}" rel="stylesheet">
 
+  <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.9/Polyline.encoded.min.js"></script>
+
+
 </head>
 
 <body>
@@ -94,154 +97,66 @@
   </section><!-- End Hero -->
 
   <main id="main">
-    <section id="home" class="home">
-      <div class="grid">
-        <div class="map1">
-          <div class="section-title">
+    <div class="map-container">
+        <div class="section-title">
             <h2>Leaflet Map</h2>
-          </div>
-          <div id="mapid"></div>
-          <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.min.js"></script>
-
-          <script>
-            // Menampilkan peta
-            var mymap = L.map('mapid').setView([-8.790008703311203, 115.16780687368956], 13);
-
-            // Map layer
-            var mapbiasa = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
-              maxZoom: 18,
-            }).addTo(mymap);
-
-            //google map tile
-            googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-              maxZoom: 20,
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-            });
-
-            googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-              maxZoom: 20,
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-            });
-
-            googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
-              maxZoom: 20,
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-            });
-
-            var Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
-              minZoom: 0,
-              maxZoom: 20,
-              attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-              ext: 'png'
-            });
-
-            //Layer Control
-            var baseLayers = {
-              "mapbiasa": mapbiasa,
-              "googleStreets": googleStreets,
-              "googleSat": googleSat,
-              "googleTerrain": googleTerrain,
-              "Stadia_AlidadeSmoothDark": Stadia_AlidadeSmoothDark
-            };
-
-            L.control.layers(baseLayers).addTo(mymap);
-
-            var markers = [];
-            var isOnDrag = false;
-            var myIcon = L.icon({
-              iconUrl: 'frontend/img/location.png',
-              iconSize: [35, 40],
-              iconAnchor: [20, 40],
-            });
-
-            // Format popup content
-            formatContent = function(lat, lng, index) {
-              return `
-                <div class="wrapper">
-                  <div class="row">
-                    <div class="cell merged" style="text-align:center">Marker [ ${index+1} ]</div>
-                  </div>
-                  <div class="row">
-                    <div class="col">Latitude</div>
-                    <div class="col2">${lat}</div>
-                  </div>
-                  <div class="row">
-                    <div class="col">Longitude</div>
-                    <div class="col2">${lng}</div>
-                  </div>
-                </div>
-              `;
-            }
-
-            addMarker = function(latlng, index) {
-              // Menambahkan marker
-              var marker = L.marker(latlng, {
-                icon: myIcon,
-                draggable: true
-              }).addTo(mymap);
-
-              // Membuat popup baru
-              var popup = L.popup({
-                offset: [0, -30]
-              })
-              .setLatLng(latlng);
-
-              // Binding popup ke marker
-              marker.bindPopup(popup);
-
-              // Menambahkan event listener pada marker
-              marker.on('click', function() {
-                popup.setLatLng(marker.getLatLng()),
-                popup.setContent(formatContent(marker.getLatLng().lat, marker.getLatLng().lng, index));
-              });
-
-              marker.on('dragstart', function(event) {
-                isOnDrag = true;
-              });
-
-              // Menambahkan event listener pada marker
-              marker.on('drag', function(event) {
-                popup.setLatLng(marker.getLatLng()),
-                popup.setContent(formatContent(marker.getLatLng().lat, marker.getLatLng().lng, index));
-                marker.openPopup();
-              });
-
-              marker.on('dragend', function(event) {
-                setTimeout(function() {
-                  isOnDrag = false;
-                }, 500);
-              });
-
-              marker.on('contextmenu', function(event) {
-                // Hapus semua marker dari array markers
-                markers.forEach(function(m, i) {
-                  if (marker == m) {
-                    m.removeFrom(mymap); // hapus marker dari peta
-                    markers.splice(i, 1);
-                  }
-                });
-              });
-
-              // Return marker
-              return marker;
-            }
-
-            // Tambahkan event listener click pada peta
-            mymap.on('click', function(e) {
-              if (!isOnDrag) {
-                // Buat marker baru
-                var newMarker = addMarker(e.latlng, markers.length);
-
-                // Tambahkan marker ke array markers
-                markers.push(newMarker);
-              }
-            });
-          </script>
         </div>
-      </div>
-    </section>
-  </main><!-- End #main -->
+        <div id="mapid" style="height: 500px;"></div>
+        <button id="getRuasJalanButton" class="btn btn-primary mt-3">Get Ruas Jalan</button>
+    </div>
+</main>
+<script>
+  var mymap = L.map('mapid').setView([-8.790008703311203, 115.16780687368956], 13);
+  var mapbiasa = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+      maxZoom: 18,
+  }).addTo(mymap);
+  var polylinePoints = [];
+  var polyline = L.polyline(polylinePoints, {color: 'red'}).addTo(mymap);
+  mymap.on('click', function(e) {
+      polylinePoints.push([e.latlng.lat, e.latlng.lng]);
+      polyline.setLatLngs(polylinePoints);
+      L.marker([e.latlng.lat, e.latlng.lng], {
+          icon: L.icon({
+              iconUrl: 'frontend/img/location.png',
+              iconSize: [25, 41],
+              iconAnchor: [12, 41],
+              popupAnchor: [1, -34],
+              shadowSize: [41, 41]
+          })
+      }).addTo(mymap);
+  });
+  document.getElementById('getRuasJalanButton').addEventListener('click', function() {
+    var apiToken = "{{ Session::get('api_token') }}";
+    fetch("{{ route('dashboard.ruasjalan') }}", {
+        headers: {
+            'Authorization': 'Bearer ' + apiToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            data.ruasjalan.forEach(ruas => {
+                let paths = ruas.paths;
+                let coordinates = decodePolyline(paths);
+                L.polyline(coordinates, { color: 'blue' }).addTo(mymap);
+            });
+        } else {
+            console.error('Failed to fetch ruas jalan data:', data);
+        }
+    })
+    .catch(error => console.error('Error fetching data:', error));
+});
+
+function decodePolyline(encoded) {
+    // Gunakan library polyline untuk mendekode polyline
+    var polyline = L.polyline.fromEncoded(encoded).getLatLngs();
+    return polyline;
+}
+
+</script>
+
+<!-- End #main -->
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
@@ -274,8 +189,20 @@
   <script src="{{ asset('frontend/vendor/aos/aos.js') }}"></script>
   <script src="{{ asset('frontend/vendor/php-email-form/validate.js') }}"></script>
 
+  
+
+  
+
+
   <!-- Template Main JS File -->
   <script src="{{ asset('frontend/js/main.js') }}"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var apiToken = "{{ Session::get('api_token') }}";
+        console.log('API Token:', apiToken);
+    });
+  </script>
 
 </body>
 

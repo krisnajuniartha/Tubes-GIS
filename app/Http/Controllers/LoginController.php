@@ -20,29 +20,33 @@ class LoginController extends Controller
     {
         try {
             $client = new Client();
-    
+
             $response = $client->post('https://gisapis.manpits.xyz/api/login', [
-                'json' => [ // Mengirim data sebagai payload JSON
+                'json' => [
                     'email'    => $request->input('email'),
                     'password' => $request->input('password'),
                 ],
             ]);
-    
+
             $body = $response->getBody();
             $content = $body->getContents();
             $data = json_decode($content, true);
 
-            Session::put('api_data', $data);
-            
-            return redirect('dashboard')->with('status', 'Login successful! Welcome.');
+            // Check if the meta key exists in the response
+            if (isset($data['meta']['token'])) {
+                // Save token to session
+                Session::put('api_token', $data['meta']['token']);
+                return redirect('dashboard')->with('status', 'Login successful! Welcome.');
+            } else {
+                return redirect()->back()->withErrors(['login' => 'Failed to get token from API response.']);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $response = $e->getResponse();
                 $content = $response->getBody()->getContents();
-                return response()->json(['error' => 'Failed to login.'], $response->getStatusCode());
-                
+                return redirect()->back()->withErrors(['login' => 'Failed to login.']);
             } else {
-                return response()->json(['error' => 'Failed to connect to the server.'], 500);
+                return redirect()->back()->withErrors(['login' => 'Failed to connect to the server.']);
             }
         }
     }
@@ -62,16 +66,15 @@ class LoginController extends Controller
             // Hapus token dari sesi setelah logout berhasil
             Session::forget('api_token');
 
+            // Redirect ke halaman login dengan pesan berhasil logout
             return redirect('login')->with('status', 'Logged out successfully.');
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
-                return redirect()->route('dashboard')->withErrors([
-                    'logout' => 'Logout failed, please try again.',
-                ]);
+                $response = $e->getResponse();
+                $content = $response->getBody()->getContents();
+                return redirect()->back()->withErrors(['logout' => 'Logout failed, please try again.']);
             } else {
-                return redirect()->route('dashboard')->withErrors([
-                    'logout' => 'Failed to connect to the server.',
-                ]);
+                return redirect()->back()->withErrors(['logout' => 'Failed to connect to the server.']);
             }
         }
     }
