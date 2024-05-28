@@ -151,23 +151,34 @@
                     console.log('Coordinates:', ruas.paths);
 
                     if (coordinates && coordinates.length > 0 && coordinates[0].length === 2) {
-                        let polyline = L.polyline(coordinates, { color: 'blue' }).addTo(mymap);
-                        polyline.on('click', function(e) {
-                            L.popup()
-                                .setLatLng(e.latlng)
-                                .setContent(`<b>${ruas.nama_ruas}</b><br>${ruas.keterangan}`)
-                                .openOn(mymap);
-                        });
-                    } else {
-                        console.error('Invalid coordinates:', coordinates);
-                    }
-                });
-            } else {
-                console.error('Failed to fetch ruas jalan data:', data);
-            }
-        })
-        .catch(error => console.error('Error fetching data:', error));
-    });
+                            let polyline = L.polyline(coordinates, { color: 'blue' }).addTo(mymap);
+                            polyline.on('click', function(e) {
+                                L.popup()
+                                    .setLatLng(e.latlng)
+                                    .setContent(`
+                                        <div>
+                                            <h5>${ruas.nama_ruas}</h5>
+                                            <p><strong>Panjang Jalan:</strong> ${ruas.panjang} km</p>
+                                            <p><strong>Eksisting ID:</strong> ${ruas.eksisting_id}</p>
+                                            <p><strong>Kondisi ID:</strong> ${ruas.kondisi_id}</p>
+                                            <p><strong>Jenis Jalan ID:</strong> ${ruas.jenisjalan_id}</p>
+                                            <p><strong>Keterangan:</strong> ${ruas.keterangan}</p>
+                                            <button class="btn btn-warning btn-sm">Edit</button>
+                                            <button class="btn btn-danger btn-sm">Delete</button>
+                                        </div>
+                                    `)
+                                    .openOn(mymap);
+                            });
+                        } else {
+                            console.error('Invalid coordinates:', coordinates);
+                        }
+                    });
+                } else {
+                    console.error('Failed to fetch ruas jalan data:', data);
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        });
 
     function decodePolyline(encoded) {
         var currentPosition = 0;
