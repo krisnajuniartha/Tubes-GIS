@@ -63,7 +63,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="panjang" class="form-label">Panjang</label>
-                        <input type="number" step="0.01" class="form-control" id="panjang" name="panjang" readonly required>
+                        <input type="number" step="0.01" class="form-control" id="panjang" name="panjang" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="lebar" class="form-label">Lebar</label>

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Session;
 
 class MapController extends Controller
 {
-    public function postRuasJalan(Request $request)
+    public function store(Request $request)
     {
         $validatedData = $request->validate([
             'paths' => 'required|string',
