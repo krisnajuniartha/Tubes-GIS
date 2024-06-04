@@ -16,11 +16,9 @@
   crossorigin=""/>
 
   <!-- Make sure you put this AFTER Leaflet's CSS -->
- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
- integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
- crossorigin=""></script>
-
-
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
 
   <!-- Favicons -->
   <link href="{{ asset('frontend/img/icon_web.png') }}" rel="icon">
@@ -29,9 +27,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="{{ asset('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap') }}" rel="stylesheet">
-
-  <link href="{{ asset('frontend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap') }}" rel="stylesheet">
 
   <link href="{{ asset('frontend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ asset('frontend/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet ">
@@ -40,9 +36,6 @@
   <link href="{{ asset('frontend/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
   <link href="{{ asset('frontend/vendor/aos/aos.css') }}" rel="stylesheet">
   <link href="{{ asset('frontend/css/form.css') }}" rel="stylesheet">
-
-  
-
 </head>
 
 <body>
@@ -67,13 +60,19 @@
                     <label for="nama_ruas" class="form-label">Nama Ruas</label>
                     <input type="text" class="form-control" id="nama_ruas" name="nama_ruas" required>
                 </div>
-                <div class="mb-3">
-                    <label for="panjang" class="form-label">Panjang</label>
-                    <input type="number" step="0.01" class="form-control" id="panjang" name="panjang" required>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="panjang" class="form-label">Panjang</label>
+                        <input type="number" step="0.01" class="form-control" id="panjang" name="panjang" readonly required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lebar" class="form-label">Lebar</label>
+                        <input type="number" step="0.01" class="form-control" id="lebar" name="lebar" required>
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label for="lebar" class="form-label">Lebar</label>
-                    <input type="number" step="0.01" class="form-control" id="lebar" name="lebar" required>
+                    <label for="paths" class="form-label">Paths</label>
+                    <input type="text" class="form-control" id="paths" name="paths" readonly required>
                 </div>
                 <div class="mb-3">
                     <label for="provinsi" class="form-label">Provinsi</label>
@@ -113,57 +112,53 @@
             </form>
         </div>
     </main><!-- End #main -->
-    
+
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/polyline/1.1.1/polyline.js"></script>
     <script>
         var mymap = L.map('mapid').setView([-8.790008703311203, 115.16780687368956], 13);
-    
+
         var mapbiasa = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
             maxZoom: 18,
         }).addTo(mymap);
-    
+
         var polylinePoints = [];
         var polyline = L.polyline(polylinePoints, {color: 'red'}).addTo(mymap);
-    
+
         mymap.on('click', function(e) {
             polylinePoints.push([e.latlng.lat, e.latlng.lng]);
             polyline.setLatLngs(polylinePoints);
+            updatePolylineData();
             L.popup()
                 .setLatLng(e.latlng)
                 .setContent("Lat: " + e.latlng.lat + "<br>Lng: " + e.latlng.lng)
                 .openOn(mymap);
         });
-    
-        function encodePolyline(points) {
-            let encoded = '';
-            let prevLat = 0, prevLng = 0;
-    
-            for (let i = 0; i < points.length; i++) {
-                let lat = Math.round(points[i][0] * 1e5);
-                let lng = Math.round(points[i][1] * 1e5);
-    
-                encoded += encodeNumber(lat - prevLat);
-                encoded += encodeNumber(lng - prevLng);
-    
-                prevLat = lat;
-                prevLng = lng;
-            }
-    
-            return encoded;
+
+        function updatePolylineData() {
+            let encodedPath = polyline.encode(polylinePoints);
+            document.getElementById('paths').value = encodedPath;
+            document.getElementById('panjang').value = calculatePolylineLength(polylinePoints);
         }
-    
-        function encodeNumber(num) {
-            num = num < 0 ? ~(num << 1) : num << 1;
-            let encoded = '';
-    
-            while (num >= 0x20) {
-                encoded += String.fromCharCode((0x20 | (num & 0x1f)) + 63);
-                num >>= 5;
+
+        function calculatePolylineLength(points) {
+            let totalLength = 0;
+            for (let i = 1; i < points.length; i++) {
+                totalLength += getDistance(points[i-1], points[i]);
             }
-    
-            encoded += String.fromCharCode(num + 63);
-            return encoded;
+            return totalLength.toFixed(6);
+        }
+
+        function getDistance(point1, point2) {
+            const R = 6371000; // Radius of the Earth in meters
+            const dLat = (point2[0] - point1[0]) * Math.PI / 180;
+            const dLng = (point2[1] - point1[1]) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(point1[0] * Math.PI / 180) * Math.cos(point2[0] * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
         }
 
         // Function to fetch and populate dropdowns
@@ -203,9 +198,9 @@
                 return;
             }
 
-            let paths = encodePolyline(polylinePoints);
+            let encodedPath = polyline.encode(polylinePoints);
             let formData = new FormData(document.getElementById('markerForm'));
-            formData.append('paths', paths);
+            formData.append('paths', encodedPath);
 
             fetch('{{ route('ruasjalan.store') }}', {
                 method: 'POST',
@@ -228,30 +223,23 @@
         document.getElementById('saveButton').addEventListener('click', savePolyline);
     </script>
 
+    <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <div id="preloader"></div>
+    <script src="{{ asset('frontend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('frontend/vendor/purecounter/purecounter_vanilla.js') }}"></script>
+    <script src="{{ asset('frontend/vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ asset('frontend/vendor/swiper/swiper-bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/typed.js/typed.umd.js') }}"></script>
+    <script src="{{ asset('frontend/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('frontend/vendor/php-email-form/validate.js') }}"></script>
+    <script src="{{ asset('frontend/js/main.js') }}"></script>
 
-  <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  <div id="preloader"></div>
-
-  <!-- Vendor JS Files -->
-  <script src="{{ asset('frontend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ asset('frontend/vendor/purecounter/purecounter_vanilla.js') }}"></script>
-  <script src="{{ asset('frontend/vendor/glightbox/js/glightbox.min.js') }}"></script>
-  <script src="{{ asset('frontend/vendor/swiper/swiper-bundle.min.js') }}"></script>
-  <script src="{{ asset('assets/vendor/typed.js/typed.umd.js') }}"></script>
-  <script src="{{ asset('frontend/vendor/aos/aos.js') }}"></script>
-  <script src="{{ asset('frontend/vendor/php-email-form/validate.js') }}"></script>
-
-  <!-- Template Main JS File -->
-  <script src="{{ asset('frontend/js/main.js') }}"></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var apiToken = "{{ Session::get('api_token') }}";
-        console.log('API Token:', apiToken);
-    });
-  </script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var apiToken = "{{ Session::get('api_token') }}";
+            console.log('API Token:', apiToken);
+        });
+    </script>
 </body>
 
 </html>

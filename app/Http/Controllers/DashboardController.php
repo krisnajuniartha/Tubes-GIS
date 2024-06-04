@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\PolylineHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
-
 
 class DashboardController extends Controller
 {
@@ -17,30 +17,20 @@ class DashboardController extends Controller
     public function getRuasJalan()
     {
         try {
-            $token = Session::get('api_token');
+            $apiToken = Session::get('api_token');
 
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $token,
+                'Authorization' => 'Bearer ' . $apiToken,
             ])->get('https://gisapis.manpits.xyz/api/ruasjalan');
 
             if ($response->successful()) {
                 $data = $response->json();
-
-                // Decode polyline paths
-                foreach ($data['ruasjalan'] as &$ruas) {
-                    $ruas['decoded_paths'] = \App\Helpers\PolylineHelper::decodePolyline($ruas['paths']);
-                    Log::info('Decoded paths for ruas id ' . $ruas['id'], $ruas['decoded_paths']);
-                }
-
-                return response()->json($data);
+                return response()->json(['status' => 'success', 'ruasjalan' => $data['ruasjalan']]);
             } else {
-                return response()->json(['error' => 'Failed to fetch data from API'], 500);
+                return response()->json(['status' => 'error', 'message' => 'Failed to fetch data from API'], 500);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
-
-
-
 }

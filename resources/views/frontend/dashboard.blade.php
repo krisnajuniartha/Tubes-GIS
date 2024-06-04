@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
+ <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -19,6 +19,9 @@
  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
  crossorigin=""></script>
+
+
+
 
   <!-- Favicons -->
   <link href="{{ asset('frontend/img/icon_web.png') }}" rel="icon">
@@ -38,8 +41,9 @@
   <link href="{{ asset('frontend/vendor/aos/aos.css') }}" rel="stylesheet">
   <link href="{{ asset('frontend/css/main.css') }}" rel="stylesheet">
 
-  <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.9/Polyline.encoded.min.js"></script>
-
+<!-- Include leaflet-encoded-polyline plugin -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-encoded-polyline/1.0.0/leaflet.polyline.encoded.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.9/Polyline.encoded.min.js"></script>
 
 </head>
 
@@ -106,6 +110,25 @@
             <h2>Leaflet Map</h2>
         </div>
         <div id="mapid" style="height: 500px;"></div>
+        <div id="placesTableContainer" class="mt-3">
+            <h3>Places</h3>
+            <table id="placesTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Nama Ruas</th>
+                        <th>Panjang Jalan (km)</th>
+                        <th>Eksisting ID</th>
+                        <th>Kondisi ID</th>
+                        <th>Jenis Jalan ID</th>
+                        <th>Keterangan</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="placesTableBody">
+                    <!-- Tempat untuk menambahkan baris data tempat secara dinamis -->
+                </tbody>
+            </table>
+        </div>
         <button id="getRuasJalanButton" class="btn btn-primary mt-3">Get Ruas Jalan</button>
     </div>
 </main>
@@ -117,108 +140,84 @@
         maxZoom: 18,
     }).addTo(mymap);
 
-    var polylinePoints = [];
-    var polyline = L.polyline(polylinePoints, { color: 'red' }).addTo(mymap);
+    var getRuasJalanButton = document.getElementById('getRuasJalanButton');
+    var polylineGroup = L.layerGroup().addTo(mymap);
 
-    // mymap.on('click', function(e) {
-    //     polylinePoints.push([e.latlng.lat, e.latlng.lng]);
-    //     polyline.setLatLngs(polylinePoints);
-    //     L.marker([e.latlng.lat, e.latlng.lng], {
-    //         icon: L.icon({
-    //             iconUrl: 'frontend/img/location.png',
-    //             iconSize: [25, 41],
-    //             iconAnchor: [12, 41],
-    //             popupAnchor: [1, -34],
-    //             shadowSize: [41, 41]
-    //         })
-    //     }).addTo(mymap);
-    // });
+    getRuasJalanButton.addEventListener('click', function() {
+        fetchRuasJalan();
+    });
 
-    document.getElementById('getRuasJalanButton').addEventListener('click', function() {
-        var apiToken = "{{ Session::get('api_token') }}";
-        fetch("https://gisapis.manpits.xyz/api/ruasjalan", {
-            headers: {
-                'Authorization': 'Bearer ' + apiToken
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('API Response:', data);
-            if (data.status === 'success') {
-                data.ruasjalan.forEach(ruas => {
-                    console.log('Processing ruas:', ruas);
-                    let coordinates = decodePolyline(ruas.paths);
-                    console.log('Coordinates:', ruas.paths);
-
-                    if (coordinates && coordinates.length > 0 && coordinates[0].length === 2) {
-                            let polyline = L.polyline(coordinates, { color: 'blue' }).addTo(mymap);
-                            polyline.on('click', function(e) {
-                                L.popup()
-                                    .setLatLng(e.latlng)
-                                    .setContent(`
-                                        <div>
-                                            <h5>${ruas.nama_ruas}</h5>
-                                            <p><strong>Panjang Jalan:</strong> ${ruas.panjang} km</p>
-                                            <p><strong>Eksisting ID:</strong> ${ruas.eksisting_id}</p>
-                                            <p><strong>Kondisi ID:</strong> ${ruas.kondisi_id}</p>
-                                            <p><strong>Jenis Jalan ID:</strong> ${ruas.jenisjalan_id}</p>
-                                            <p><strong>Keterangan:</strong> ${ruas.keterangan}</p>
-                                            <button class="btn btn-warning btn-sm">Edit</button>
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </div>
-                                    `)
-                                    .openOn(mymap);
-                            });
-                        } else {
-                            console.error('Invalid coordinates:', coordinates);
-                        }
-                    });
-                } else {
-                    console.error('Failed to fetch ruas jalan data:', data);
-                }
-            })
-            .catch(error => console.error('Error fetching data:', error));
-        });
-
-    function decodePolyline(encoded) {
-        var currentPosition = 0;
-        var currentLat = 0;
-        var currentLng = 0;
-        var dataLength = encoded.length;
-        var polyline = [];
-
-        while (currentPosition < dataLength) {
-            var shift = 0;
-            var result = 0;
-            var byte = null;
-
-            do {
-                byte = encoded.charCodeAt(currentPosition++) - 63;
-                result |= (byte & 0x1f) << shift;
-                shift += 5;
-            } while (byte >= 0x20);
-
-            var deltaLat = ((result & 1) ? ~(result >> 1) : (result >> 1));
-            currentLat += deltaLat;
-
-            shift = 0;
-            result = 0;
-
-            do {
-                byte = encoded.charCodeAt(currentPosition++) - 63;
-                result |= (byte & 0x1f) << shift;
-                shift += 5;
-            } while (byte >= 0x20);
-
-            var deltaLng = ((result & 1) ? ~(result >> 1) : (result >> 1));
-            currentLng += deltaLng;
-
-            polyline.push([currentLat * 1e-5, currentLng * 1e-5]);
+    function fetchRuasJalan() {
+    var apiToken = "{{ Session::get('api_token') }}";
+    fetch("https://gisapis.manpits.xyz/api/ruasjalan", {
+        headers: {
+            'Authorization': 'Bearer ' + apiToken
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('API Response:', data);
+        if (data.status === 'success') {
+            // Kosongkan tabel sebelum menambahkan baris baru
+            document.getElementById('placesTableBody').innerHTML = '';
 
-        return polyline;
-    }
+            data.ruasjalan.forEach(ruas => {
+                console.log('Processing ruas:', ruas);
+                if (ruas.paths) {
+                    let decodedPaths = L.Polyline.fromEncoded(ruas.paths).getLatLngs();
+                    console.log('Decoded paths:', ruas.paths, '=>', decodedPaths);
+                    if (decodedPaths && decodedPaths.length > 0) {
+                        let polyline = L.polyline(decodedPaths, { color: 'blue' }).addTo(polylineGroup);
+                        polyline.on('click', function(e) {
+                            L.popup()
+                                .setLatLng(e.latlng)
+                                .setContent(`
+                                    <div>
+                                        <h5>${ruas.nama_ruas}</h5>
+                                        <p><strong>Panjang Jalan:</strong> ${ruas.panjang} km</p>
+                                        <p><strong>Eksisting ID:</strong> ${ruas.eksisting_id}</p>
+                                        <p><strong>Kondisi ID:</strong> ${ruas.kondisi_id}</p>
+                                        <p><strong>Jenis Jalan ID:</strong> ${ruas.jenisjalan_id}</p>
+                                        <p><strong>Keterangan:</strong> ${ruas.keterangan}</p>
+                                        <button class="btn btn-warning btn-sm">Edit</button>
+                                        <button class="btn btn-danger btn-sm">Delete</button>
+                                    </div>
+                                `)
+                                .openOn(mymap);
+                        });
+
+                        // Tambahkan baris ke tabel
+                        document.getElementById('placesTableBody').innerHTML += `
+                            <tr>
+                                <td>${ruas.nama_ruas}</td>
+                                <td>${ruas.panjang}</td>
+                                <td>${ruas.eksisting_id}</td>
+                                <td>${ruas.kondisi_id}</td>
+                                <td>${ruas.jenisjalan_id}</td>
+                                <td>${ruas.keterangan}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm">Edit</button>
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        console.error('Empty or invalid coordinates for ruas:', ruas.paths);
+                    }
+                } else {
+                    console.error('No paths attribute found for ruas:', ruas);
+                }
+            });
+        } else {
+            console.error('Failed to fetch ruas jalan data:', data);
+        }
+    })
+    .catch(error => console.error('Error fetching data:', error));
+}
+
 </script>
+
+
 <!-- End #main -->
 
   <!-- ======= Footer ======= -->
