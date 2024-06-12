@@ -7,7 +7,7 @@
     <title>Pages / Login</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
-    <link href="{{ asset('frontend/img/icon_web.png') }}" rel="icon">
+    <link href="{{ asset('landingpage/img/icon_web.png') }}" rel="icon">
     <link href="{{ asset('auth/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
     <link href="{{ asset('https://fonts.gstatic.com') }}" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
@@ -33,7 +33,7 @@
                         </div>
 
                         <div class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
-                            <form style="width: 23rem;" method="POST" action="{{ url('/login') }}">
+                            <form style="width: 23rem;" method="POST" id="login-form" action="/login">
                                 @csrf
                                 <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Login</h3>
                             

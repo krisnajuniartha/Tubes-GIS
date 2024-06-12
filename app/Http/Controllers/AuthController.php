@@ -10,12 +10,6 @@ use GuzzleHttp\Exception\RequestException;
 
 class AuthController extends Controller
 {
-    public function showLoginForm(Request $request)
-    {
-        $status = $request->session()->get('status');
-        return view('auth.login', compact('status'));
-    }
-
     public function login(Request $request)
     {
         try {
@@ -35,8 +29,8 @@ class AuthController extends Controller
             // Check if the meta key exists in the response
             if (isset($data['meta']['token'])) {
                 // Save token to session
-                Session::put('api_token', $data['meta']['token']);
-                return redirect('dashboard')->with('status', 'Login successful! Welcome.');
+                Session::put('token', $data['meta']['token']);
+                return redirect('/')->with('status', 'Login successful! Welcome.');
             } else {
                 return redirect()->back()->withErrors(['login' => 'Failed to get token from API response.']);
             }
@@ -84,7 +78,7 @@ class AuthController extends Controller
     {
         try {
             $client = new Client();
-            $token = Session::get('api_token'); // Ambil token dari sesi
+            $token = Session::get('token'); // Ambil token dari sesi
 
             $response = $client->post('https://gisapis.manpits.xyz/api/logout', [
                 'headers' => [
@@ -93,7 +87,7 @@ class AuthController extends Controller
             ]);
 
             // Hapus token dari sesi setelah logout berhasil
-            Session::forget('api_token');
+            Session::forget('token');
 
             // Redirect ke halaman login dengan pesan berhasil logout
             return redirect('login')->with('status', 'Logged out successfully.');
@@ -107,4 +101,40 @@ class AuthController extends Controller
             }
         }
     }
+
+    public function getUser()
+    {
+        try {
+            $token = session('token');
+
+            $client = new Client();
+            $response = $client->get('https://gisapis.manpits.xyz/api/user', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Accept'        => 'application/json',
+                ],
+            ]);
+
+            $body = $response->getBody();
+            $content = $body->getContents();
+            $data = json_decode($content, true);
+
+            if ($response->getStatusCode() === 200 && isset($data['data']['user']['name'])) {
+                $name = $data['data']['user']['name'];
+                session(['user_name' => $name]);
+                return $name;
+            } else {
+                return response()->json($data, $response->getStatusCode());
+            }
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+                $content = $response->getBody()->getContents();
+                return response()->json(['error' => 'Failed to get user data.'], $response->getStatusCode());
+            } else {
+                return response()->json(['error' => 'Failed to connect to the server.'], 500);
+            }
+        }
+    }
+
 }
