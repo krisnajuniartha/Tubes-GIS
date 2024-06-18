@@ -45,14 +45,16 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body id="page-top">
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
         <div class="container">
-            <a class="navbar-brand" href="#page-top"><img src=" {{ asset('landingpage/assets/img/icon_web.png') }}"
-                    alt="..." />Ruas Jalan Bali</a>
+            {{-- <a class="navbar-brand" href="#page-top"><img src=" {{ asset('landingpage/assets/img/icon_web.png') }}"
+                    alt="..." />Ruas Jalan Bali</a> --}}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
                 aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 Menu
@@ -63,7 +65,8 @@
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                     @if (session('token'))
                         <li class="nav-item"><a class="nav-link" href="/edit-ruasjalan">Edit Jalan</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/add-ruasjalan">Tambah Jalan</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/add-ruasjalan">Add Jalan</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/table-form">Daftar Jalan</a></li>
                         <li class="nav-item dropdown pe-3">
                             <a class="nav-link nav-profile d-flex align-items-center pe-0" href=""
                                 data-bs-toggle="dropdown">

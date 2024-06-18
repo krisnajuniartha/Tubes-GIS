@@ -21,20 +21,19 @@
 
             <div class="table-responsive mt-4" style="max-width: 100%; overflow-x: auto;">
                 @if (!empty($ruasJalanDetails))
-                    <table class="table table-bordered" id="ruasJalanTable">
+                    <table class="table" id="ruasJalanTable">
                         <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Desa ID</th>
                                 <th>Kode Ruas</th>
                                 <th>Nama Ruas</th>
-                                <th>Panjang</th>
-                                <th>Lebar</th>
                                 <th>Eksisting ID</th>
                                 <th>Kondisi ID</th>
                                 <th>Jenis Jalan ID</th>
                                 <th>Keterangan</th>
-                                {{-- <th >Cari</th> --}}
+                                <th>Panjang</th>
+                                <th>Lebar</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -44,13 +43,12 @@
                                     <td>{{ $ruas['desa_id'] }}</td>
                                     <td>{{ $ruas['kode_ruas'] }}</td>
                                     <td>{{ $ruas['nama_ruas'] }}</td>
-                                    <td>{{ $ruas['panjang'] }}</td>
-                                    <td>{{ $ruas['lebar'] }}</td>
                                     <td>{{ $ruas['eksisting_id'] }}</td>
                                     <td>{{ $ruas['kondisi_id'] }}</td>
                                     <td>{{ $ruas['jenisjalan_id'] }}</td>
                                     <td>{{ $ruas['keterangan'] }}</td>
-                                    {{-- <td><button onclick="boundPolyline({{ json_encode($ruas['paths2']) }})" class="btn btn-primary mt-3">Cari</button> --}}
+                                    <td>{{ $ruas['panjang'] }}</td>
+                                    <td>{{ $ruas['lebar'] }}</td>
                                     </td>
                                 </tr>
                             @endforeach
@@ -72,10 +70,31 @@
                 var ruasJalanDetails = JSON.parse(document.getElementById('ruasJalanDetails').textContent);
                 console.log(ruasJalanDetails);
 
-                var polycolors = ['red', 'blue', 'green', 'purple', 'orange', 'yellow', 'pink', 'brown', 'black'];
+                // var polycolors = ['red'];
+
+                // ruasJalanDetails.forEach(function(ruas, index) {
+                //     var color = polycolors[index % polycolors.length];
+                //     var polyline = L.polyline(ruas.paths, {
+                //         color: color
+                //     }).addTo(mymap);
 
                 ruasJalanDetails.forEach(function(ruas, index) {
-                    var color = polycolors[index % polycolors.length];
+                    var color;
+                    switch (ruas.kondisi_id) {
+                        case 1:
+                            color = 'green'; // baik
+                            break;
+                        case 2:
+                            color = 'orange'; // sedang
+                            break;
+                        case 3:
+                            color = 'red'; // rusak
+                            break;
+                        default:
+                            color = 'gray'; // default
+                    }
+                    
+                    
                     var polyline = L.polyline(ruas.paths, {
                         color: color
                     }).addTo(mymap);
@@ -90,14 +109,14 @@
                     polyline.on('click', function(e) {
                         console.log(`Polyline ${index + 1} clicked`);
                         var popupContent = `
-                    <div class="popup-content">
-                            <h5>${ruas.nama_ruas}</h5>
-                            <p><strong>Panjang Jalan:</strong> ${ruas.panjang} km</p>
-                            <p><strong>Eksisting ID:</strong> ${ruas.eksisting_id}</p>
-                            <p><strong>Kondisi ID:</strong> ${ruas.kondisi_id}</p>
-                            <p><strong>Jenis Jalan ID:</strong> ${ruas.jenisjalan_id}</p>
-                            <p><strong>Keterangan:</strong> ${ruas.keterangan}</p>
-                        </div>
+                            <div class="popup-content">
+                                <h5>${ruas.nama_ruas}</h5>
+                                <p><strong>Panjang Jalan:</strong> ${ruas.panjang} km</p>
+                                <p><strong>Eksisting ID:</strong> ${ruas.eksisting_id}</p>
+                                <p><strong>Kondisi ID:</strong> ${ruas.kondisi_id}</p>
+                                <p><strong>Jenis Jalan ID:</strong> ${ruas.jenisjalan_id}</p>
+                                <p><strong>Keterangan:</strong> ${ruas.keterangan}</p>
+                            </div>
                     `;
                         L.popup()
                             .setLatLng(e.latlng)

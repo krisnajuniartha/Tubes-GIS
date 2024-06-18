@@ -18,7 +18,7 @@
                         <h2>Edit Map</h2>
                         <div id="map" class="map"></div>
                         <button type="button" class="btn btn-secondary" id="resetMap">Reset</button>
-                        {{-- <button id="toggle-add-marker" class="btn btn-secondary" type="button">Off Add Marker</button> --}}
+                        <button id="toggle-add-marker" class="btn btn-secondary" type="button">Off Add Marker</button>
                     </div>
                 </div>
                 <div class="col-md-4 form-container">
@@ -161,13 +161,15 @@
 
             var myIcon = L.icon({
                 iconUrl: 'assets/img/icon_web.png',
-                iconSize: [35, 40],
+                iconSize: [30, 30],
                 iconAnchor: [20, 40],
             });
 
             var ruasJalanDetails = JSON.parse(document.getElementById('ruasJalanDetails').textContent);
             console.log(ruasJalanDetails);
 
+
+            
             var polycolors = ['red', 'blue', 'green', 'purple', 'orange', 'yellow', 'pink', 'brown', 'black'];
 
             ruasJalanDetails.forEach(function(ruas, index) {

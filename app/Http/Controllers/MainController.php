@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Pagination\Paginator;
 
 class MainController extends Controller
 {
@@ -153,6 +154,14 @@ class MainController extends Controller
                         'keterangan' => $ruas['keterangan']
                     ];
                 }
+
+                            // Paginate the data
+                // $perPage = 5; // Number of items per page
+                // $currentPage = Paginator::resolveCurrentPage('page');
+                // $currentItems = array_slice($ruasJalanDetails, ($currentPage - 1) * $perPage, $perPage);
+                // $ruasJalanDetails = new Paginator($currentItems, count($ruasJalanDetails), $perPage, $currentPage);
+
+                
                 return view($viewType, compact('ruasJalanDetails'));
                 // return view('frontend.dashboard-main2', compact('ruasJalanDetails'));
             } else {
@@ -164,6 +173,12 @@ class MainController extends Controller
             // Tangani semua pengecualian
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function getRuasJalanTable ($viewType = 'default-view')
+    {   
+        
+        return $this->getRuasJalan('frontend.table-form');
     }
 
     public function getRuasJalanForEdit()
@@ -302,49 +317,4 @@ class MainController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus ruas jalan: ' . $e->getMessage());
         }
     }
-
-    // public function getRuasJalanForEdit()
-    // {
-
-    //     $token = Session::get('token');
-    //     $client = new Client();
-
-    //     try {
-    //         // Lakukan permintaan GET ke API ruas jalan
-    //         $response = $client->request('GET', 'https://gisapis.manpits.xyz/api/ruasjalan', [
-    //             'headers' => [
-    //                 'Authorization' => 'Bearer ' . $token // Gunakan token dari sesi
-    //             ]
-    //         ]);
-
-    //         // Mendapatkan data JSON dari respons
-    //         $data = json_decode($response->getBody()->getContents(), true);
-
-    //         // Tangkap data ruas jalan
-    //         $ruasJalan = [];
-
-    //         foreach ($data['ruasjalan'] as $ruas) {
-    //             // Menyiapkan data ruas jalan agar sesuai dengan struktur yang diharapkan
-    //             $ruasJalan[] = [
-    //                 'id' => $ruas['id'],
-    //                 'paths' => $ruas['paths'],
-    //                 'desa_id' => $ruas['desa_id'],
-    //                 'kode_ruas' => $ruas['kode_ruas'],
-    //                 'nama_ruas' => $ruas['nama_ruas'],
-    //                 'panjang' => $ruas['panjang'],
-    //                 'lebar' => $ruas['lebar'],
-    //                 'eksisting_id' => $ruas['eksisting_id'],
-    //                 'kondisi_id' => $ruas['kondisi_id'],
-    //                 'jenisjalan_id' => $ruas['jenisjalan_id'],
-    //                 'keterangan' => $ruas['keterangan'],
-    //             ];
-    //         }
-
-    //         // Tampilkan view dengan data ruas jalan
-    //         return view('frontend.edit-ruas', compact('ruasJalan'));
-    //     } catch (\Exception $e) {
-    //         // Tangani kesalahan jika ada
-    //         return response()->json(['error' => $e->getMessage()], 500);
-    //     }
-    // }
 }

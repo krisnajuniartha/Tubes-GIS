@@ -146,6 +146,19 @@
 
                 // Setelah console log dilakukan, Anda bisa melakukan submit form
                 // document.getElementById('ruasForm').submit();
+
+                // Menggunakan SweetAlert untuk menampilkan pesan sukses
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: 'Berhasil menambahkan ruas jalan: ' + namaRuas,
+                    icon: 'success',
+                    // confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Lakukan submit form setelah alert dikonfirmasi
+                        document.getElementById('ruasForm').submit();
+                    }
+                });
             });
         </script>
 
