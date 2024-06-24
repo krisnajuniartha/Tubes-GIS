@@ -47,6 +47,12 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-editable/1.2.0/Leaflet.Editable.min.js"></script>
+
 </head>
 
 <body id="page-top">
@@ -74,7 +80,7 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="https://github.com/krisnajuniartha">
+                                    <a class="dropdown-item d-flex align-items-center" href="https://github.com/krisnajuniartha" target="blank">
                                         <i class="bi bi-person"></i>
                                         <span>Profile</span>
                                     </a>
@@ -97,16 +103,16 @@
             </div>
         </div>
     </nav>
-    <header class="masthead">
+    {{-- <header class="masthead">
         <div class="container">
             <div class="masthead-heading text-uppercase">Ruas Jalan Bali</div>
         </div>
-    </header>
+    </header> --}}
 
     <section>
         @yield('content')
     </section>
-
+    
 
       <!-- ======= Footer ======= -->
   <footer id="footer" class="footer py-4">

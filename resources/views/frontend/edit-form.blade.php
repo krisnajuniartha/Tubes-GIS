@@ -18,7 +18,7 @@
                         <h2>Edit Map</h2>
                         <div id="map" class="map"></div>
                         <button type="button" class="btn btn-secondary" id="resetMap">Reset</button>
-                        <button id="toggle-add-marker" class="btn btn-secondary" type="button">Off Add Marker</button>
+                        {{-- <button id="toggle-add-marker" class="btn btn-secondary" type="button">Off Add Marker</button> --}}
                     </div>
                 </div>
                 <div class="col-md-4 form-container">
@@ -152,6 +152,7 @@
             var map = L.map('map').setView([-8.4095188, 115.188919], 10);
             var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
             var markers = [];
@@ -177,6 +178,8 @@
                 var polyline = L.polyline(ruas.paths, {
                     color: color
                 }).addTo(map);
+
+                
 
                 polyline.on('click', function(e) {
                     console.log(`Polyline ${index + 1} selected`);
@@ -218,19 +221,41 @@
                 form.action = `/ruasjalan/update/${currentRuasId}`;
             }
 
+            
             function submitForm(method) {
                 var form = document.getElementById('ruasForm');
                 var methodInput = document.getElementById('_method');
                 methodInput.value = method;
+
                 if (method === 'DELETE') {
-                    form.action = `/ruasjalan/delete/${currentRuasId}`;
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.action = `/ruasjalan/delete/${currentRuasId}`;
+                            form.submit();
+                        }
+                    });
+                } else {
+                    form.submit();
+                    Swal.fire({
+                        title: 'Sukses!',
+                        text: 'Form berhasil disimpan',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
                 }
-                form.submit();
             }
 
             function addMarker(latlng, index) {
                 var marker = L.marker(latlng, {
-                    icon: myIcon,
+                    // icon: myIcon,
                     draggable: true
                 }).addTo(map);
 

@@ -113,6 +113,80 @@
             </div>
         </div>
         <script>
+
+// document.addEventListener('DOMContentLoaded', function() {
+//         const headers = {
+//             'Authorization': 'Bearer {{ Session::get("token") }}'
+//         };
+
+//         const provinsiSelect = document.getElementById('provinsi');
+//         const kabupatenSelect = document.getElementById('kabupaten');
+//         const kecamatanSelect = document.getElementById('kecamatan');
+//         const desaSelect = document.getElementById('desaSelect');
+
+//         provinsiSelect.addEventListener('change', function() {
+//             const selectedProvinsiId = this.value;
+//             kabupatenSelect.innerHTML = '<option selected disabled>Pilih Kabupaten</option>';
+//             kecamatanSelect.innerHTML = '<option selected disabled>Pilih Kecamatan</option>';
+//             desaSelect.innerHTML = '<option selected disabled>Pilih Desa</option>';
+
+//             axios.get(`https://gisapis.manpits.xyz/api/kabupaten/${selectedProvinsiId}`, { headers })
+//                 .then(response => {
+//                     const kabupaten = response.data.kabupaten;
+//                     kabupaten.forEach(kab => {
+//                         const option = document.createElement('option');
+//                         option.value = kab.id;
+//                         option.textContent = kab.kabupaten;
+//                         kabupatenSelect.appendChild(option);
+//                     });
+//                 })
+//                 .catch(error => {
+//                     console.error('Error fetching kabupaten:', error);
+//                 });
+//         });
+
+//         kabupatenSelect.addEventListener('change', function() {
+//             const selectedKabupatenId = this.value;
+//             kecamatanSelect.innerHTML = '<option selected disabled>Pilih Kecamatan</option>';
+//             desaSelect.innerHTML = '<option selected disabled>Pilih Desa</option>';
+
+//             axios.get(`https://gisapis.manpits.xyz/api/kecamatan/${selectedKabupatenId}`, { headers })
+//                 .then(response => {
+//                     const kecamatan = response.data.kecamatan;
+//                     kecamatan.forEach(kec => {
+//                         const option = document.createElement('option');
+//                         option.value = kec.id;
+//                         option.textContent = kec.kecamatan;
+//                         kecamatanSelect.appendChild(option);
+//                     });
+//                 })
+//                 .catch(error => {
+//                     console.error('Error fetching kecamatan:', error);
+//                 });
+//         });
+
+//         kecamatanSelect.addEventListener('change', function() {
+//             const selectedKecamatanId = this.value;
+//             desaSelect.innerHTML = '<option selected disabled>Pilih Desa</option>';
+
+//             axios.get(`https://gisapis.manpits.xyz/api/desa/${selectedKecamatanId}`, { headers })
+//                 .then(response => {
+//                     const desa = response.data.desa;
+//                     desa.forEach(des => {
+//                         const option = document.createElement('option');
+//                         option.value = des.id;
+//                         option.textContent = des.desa;
+//                         desaSelect.appendChild(option);
+//                     });
+//                 })
+//                 .catch(error => {
+//                     console.error('Error fetching desa:', error);
+//                 });
+//         });
+//     });
+
+
+
             document.getElementById('ruasForm').addEventListener('submit', function(event) {
                 event.preventDefault(); // Mencegah form untuk melakukan submit standar
 
@@ -152,7 +226,8 @@
                     title: 'Berhasil!',
                     text: 'Berhasil menambahkan ruas jalan: ' + namaRuas,
                     icon: 'success',
-                    // confirmButtonText: 'OK'
+                    showConfirmButton: false,
+                    timer: 1500
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Lakukan submit form setelah alert dikonfirmasi
@@ -160,6 +235,7 @@
                     }
                 });
             });
+
         </script>
 
         <!-- Bootstrap JS -->

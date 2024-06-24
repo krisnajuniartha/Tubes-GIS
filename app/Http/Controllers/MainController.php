@@ -103,9 +103,67 @@ class MainController extends Controller
         }
 
         // Tampilkan data
-        // return view('frontend.tambah-ruas', compact('provinsi', 'kabupaten', 'kecamatan', 'desa', 'perkerasanEksisting', 'jenisJalan', 'kondisiJalan', 'dropdownProvinsi', 'dropdownKabupaten', 'dropdownKecamatan', 'dropdownDesa'));
         return view('frontend.tambah-form', compact('provinsi', 'kabupaten', 'kecamatan', 'desa', 'eksisting', 'jenisJalan', 'kondisiJalan'));
-        // return view('frontend.tambah-ruas', compact('provinsis', 'kabupatens', 'kecamatans', 'desas', 'eksisting', 'jenisJalan', 'kondisiJalan'));
+    }
+
+    public function getKabupatenByProvinsiId($provinsiId)
+    {
+        $token = Session::get('token');
+        $client = new Client();
+
+        try {
+            $response = $client->request('GET', 'https://gisapis.manpits.xyz/api/kabupaten/' . $provinsiId, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token
+                ]
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            return response()->json($data['kabupaten']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getKecamatanByKabupatenId($kabupatenId)
+    {
+        $token = Session::get('token');
+        $client = new Client();
+
+        try {
+            $response = $client->request('GET', 'https://gisapis.manpits.xyz/api/kecamatan/' . $kabupatenId, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token
+                ]
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            return response()->json($data['kecamatan']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getDesaByKecamatanId($kecamatanId)
+    {
+        $token = Session::get('token');
+        $client = new Client();
+
+        try {
+            $response = $client->request('GET', 'https://gisapis.manpits.xyz/api/desa/' . $kecamatanId, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token
+                ]
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            return response()->json($data['desa']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function view()
@@ -216,6 +274,53 @@ class MainController extends Controller
         return $latlngs;
     }
 
+    public function search(Request $request)
+    {
+        $token = Session::get('token');
+        $client = new Client();
+        $searchTerm = $request->input('search');
+
+        try {
+            $response = $client->request('GET', 'https://gisapis.manpits.xyz/api/ruasjalan', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token
+                ],
+            ]);
+
+            $data = json_decode($response->getBody(), true);
+
+            if (isset($data['ruasjalan']) && !empty($data['ruasjalan'])) {
+                $ruasJalanDetails = [];
+
+                foreach ($data['ruasjalan'] as $ruas) {
+                    if (!$searchTerm || stripos($ruas['kode_ruas'], $searchTerm) !== false || stripos($ruas['nama_ruas'], $searchTerm) !== false) {
+                        $latLngArray = $this->decodePolyline($ruas['paths']);
+
+                        $ruasJalanDetails[] = [
+                            'id' => $ruas['id'],
+                            'paths' => $latLngArray,
+                            'paths2' => $ruas['paths'],
+                            'desa_id' => $ruas['desa_id'],
+                            'kode_ruas' => $ruas['kode_ruas'],
+                            'nama_ruas' => $ruas['nama_ruas'],
+                            'panjang' => $ruas['panjang'],
+                            'lebar' => $ruas['lebar'],
+                            'eksisting_id' => $ruas['eksisting_id'],
+                            'kondisi_id' => $ruas['kondisi_id'],
+                            'jenisjalan_id' => $ruas['jenisjalan_id'],
+                            'keterangan' => $ruas['keterangan']
+                        ];
+                    }
+                }
+
+                return view('frontend.table-form', compact('ruasJalanDetails'));
+            } else {
+                return view('frontend.table-form');
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
     public function submitRuasJalan(Request $request)
     {
