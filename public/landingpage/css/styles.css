@@ -11339,7 +11339,7 @@ section#contact form#contactForm :-ms-input-placeholder {
 
 #mapid {
   width: 100%;
-  height: 650px;
+  height: 600px;
   margin: 0;
   padding: 0;
 }
@@ -11399,4 +11399,22 @@ section#contact form#contactForm :-ms-input-placeholder {
 
 .legend-color.red {
   background-color: red;
+}
+
+.checkbox-road-view {
+  display: block;
+  position: absolute;
+  width: fit-content;
+  right: 2vw;
+  top: 6vw;
+  margin-left: 20px; /* Position the element horizontally centered */
+  background-color: #fff;
+  box-shadow: 1px 27px 85px -27px rgba(0,0,0,0.07);
+  -webkit-box-shadow: 1px 27px 85px -27px rgba(0,0,0,0.07);
+  -moz-box-shadow: 1px 27px 85px -27px rgba(0,0,0,0.07);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  z-index: 1000;
 }

@@ -8,146 +8,128 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 map-container">
-                    <script>
-                        var polylineData = JSON.parse(document.getElementById('polylineData').textContent);
-                        console.log(polylineData);
-                    </script>
                     <!-- Left Side (Map) -->
                     <div class="p-4">
-                        <!-- Your map content here -->
                         <h2>Edit Map</h2>
                         <div id="map" class="map"></div>
                         <button type="button" class="btn btn-secondary" id="resetMap">Reset</button>
-                        {{-- <button id="toggle-add-marker" class="btn btn-secondary" type="button">Off Add Marker</button> --}}
                     </div>
                 </div>
                 <div class="col-md-4 form-container">
                     <!-- Right Side (Form) -->
                     <div class="p-4">
-                        <!-- Your form content here -->
                         <h2>Edit</h2>
-                        <form id="ruasForm" method="POST" class="ruas-jalan-form">
+                        <form id="ruasForm" method="POST" class="ruas-jalan-form" action="">
                             @csrf
-                            <input type="hidden" name="_method" id="_method" value="PUT">
-                            <div class="mb-3">
-                                <label for="id_ruas" class="form-label">ID Ruas:</label>
-                                <input type="text" id="id_ruas" name="id_ruas" class="form-control" readonly>
+                            @method('PUT') <!-- Hidden field to spoof PUT method -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="id_ruas">ID Ruas:</label>
+                                        <input type="text" id="id_ruas" name="id_ruas" class="form-control" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="provinsi_id">Provinsi:</label>
+                                        <select id="provinsi_id" name="provinsi_id" class="form-control">
+                                            <option value="">Pilih Provinsi</option>
+                                            <option value="1">Bali</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="kabupaten_id">Kabupaten:</label>
+                                        <select id="kabupaten_id" name="kabupaten_id" class="form-control">
+                                            <option value="">Pilih Kabupaten</option>
+                                            <option value="1">Jembrana</option>
+                                            <option value="2">Tabanan</option>
+                                            <option value="3">Badung</option>
+                                            <option value="4">Denpasar</option>
+                                            <option value="5">Buleleng</option>
+                                            <option value="6">Gianyar</option>
+                                            <option value="7">Bangli</option>
+                                            <option value="8">Klungkung</option>
+                                            <option value="9">Karangasem</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="nama_ruas">Nama Ruas:</label>
+                                        <input type="text" id="nama_ruas" name="nama_ruas" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="eksisting_id">Eksisting ID:</label>
+                                        <select id="eksisting_id" name="eksisting_id" class="form-control">
+                                            <option value="">Pilih Eksisting</option>
+                                            <option value="1">Tanah</option>
+                                            <option value="2">Tanah/Beton</option>
+                                            <option value="3">Perkerasan</option>
+                                            <option value="4">Koral</option>
+                                            <option value="5">Lapen</option>
+                                            <option value="6">Paving</option>
+                                            <option value="7">Hotmix</option>
+                                            <option value="8">Beton</option>
+                                            <option value="9">Beton/Lapen</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="jenisjalan_id">Jenis Jalan:</label>
+                                        <select id="jenisjalan_id" name="jenisjalan_id" class="form-control">
+                                            <option value="">Pilih Jenis Jalan</option>
+                                            <option value="1">Jalan Desa</option>
+                                            <option value="2">Jalan Kabupaten</option>
+                                            <option value="3">Jalan Provinsi</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="kondisi_id">Kondisi:</label>
+                                        <select id="kondisi_id" name="kondisi_id" class="form-control">
+                                            <option value="">Pilih Kondisi</option>
+                                            <option value="1">Kondisi Baik</option>
+                                            <option value="2">Kondisi Sedang</option>
+                                            <option value="3">Kondisi Rusak</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="desa_id">ID Desa:</label>
+                                        <input type="text" id="desa_id" name="desa_id" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="paths_get">Path:</label>
+                                        <input type="text" id="paths_get" name="paths_get" class="form-control" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="kecamatan_id">Kecamatan:</label>
+                                        <input type="text" id="kecamatan_id" name="kecamatan_id" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="desa_nama">Desa:</label>
+                                        <input type="text" id="desa_nama" name="desa_nama" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="kode_ruas">Kode Ruas:</label>
+                                        <input type="text" id="kode_ruas" name="kode_ruas" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="panjang">Panjang (KM):</label>
+                                        <input type="text" id="panjang" name="panjang" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lebar">Lebar:</label>
+                                        <input type="number" id="lebar" name="lebar" class="form-control">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="paths_get" class="form-label">Path:</label>
-                                <input type="text" id="paths_get" name="paths_get" class="form-control" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label for="desa_id" class="form-label">Desa:</label>
-                                <input type="text" id="desa_id" name="desa_id" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label for="kode_ruas" class="form-label">Kode Ruas:</label>
-                                <input type="text" id="kode_ruas" name="kode_ruas" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label for="nama_ruas" class="form-label">Nama Ruas:</label>
-                                <input type="text" id="nama_ruas" name="nama_ruas" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label for="panjang" class="form-label">Panjang:</label>
-                                <input type="text" step="0.01" id="panjang" name="panjang" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label for="lebar" class="form-label">Lebar:</label>
-                                <input type="number" step="0.01" id="lebar" name="lebar" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label for="eksisting_id" class="form-label">Eksisting ID:</label>
-                                <input type="number" id="eksisting_id" name="eksisting_id" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label for="kondisi_id" class="form-label">Kondisi ID:</label>
-                                <input type="number" id="kondisi_id" name="kondisi_id" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label for="jenisjalan_id" class="form-label">Jenis Jalan ID:</label>
-                                <input type="number" id="jenisjalan_id" name="jenisjalan_id" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label for="keterangan" class="form-label">Keterangan:</label>
+                            <div class="form-group">
+                                <label for="keterangan">Keterangan:</label>
                                 <input type="text" id="keterangan" name="keterangan" class="form-control">
                             </div>
-                            <button type="button" onclick="submitForm('PUT')" class="btn btn-warning btn-sm">Simpan</button>
-                            <button type="button" onclick="submitForm('DELETE')" class="btn btn-danger btn-sm">Hapus</button>
+                            <button type="submit" class="btn btn-warning btn-sm">Simpan</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
 
-        <script>
-            $(document).ready(function() {
-                $('#provinsi').on('change', function() {
-                    var prov_id = $(this).val();
-                    $.ajax({
-                        url: '/get-kabupaten',
-                        data: {
-                            prov_id: prov_id
-                        },
-                        success: function(response) {
-                            var options = '<option value="">Pilih Kabupaten</option>';
-                            $.each(response, function(index, item) {
-                                options += '<option value="' + item.id + '">' + item
-                                    .kabupaten + '</option>';
-                            });
-                            $('#kabupaten').html(options);
-                            $('#kecamatan').html('<option value="">Pilih Kecamatan</option>');
-                            $('#desa').html('<option value="">Pilih Desa</option>');
-                        }
-                    });
-                });
-
-                $('#kabupaten').on('change', function() {
-                    var kab_id = $(this).val();
-                    $.ajax({
-                        url: '/get-kecamatan',
-                        data: {
-                            kab_id: kab_id
-                        },
-                        success: function(response) {
-                            var options = '<option value="">Pilih Kecamatan</option>';
-                            $.each(response, function(index, item) {
-                                options += '<option value="' + item.id + '">' + item
-                                    .kecamatan + '</option>';
-                            });
-                            $('#kecamatan').html(options);
-                            $('#desa').html('<option value="">Pilih Desa</option>');
-                        }
-                    });
-                });
-
-                $('#kecamatan').on('change', function() {
-                    var kec_id = $(this).val();
-                    $.ajax({
-                        url: '/get-desa',
-                        data: {
-                            kec_id: kec_id
-                        },
-                        success: function(response) {
-                            var options = '<option value="">Pilih Desa</option>';
-                            $.each(response, function(index, item) {
-                                options += '<option value="' + item.id + '">' + item.desa +
-                                    '</option>';
-                            });
-                            $('#desa').html(options);
-                        }
-                    });
-                });
-            });
-        </script>
-        <!-- Bootstrap JS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <!-- Leaflet JS -->
-        <!-- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-            integrity="sha384-IW65Vy9Gkf4lHTNerFxFqV4OFL2FgITJ0bMWz2PyQT7zj2xlF5v9Skk7V4VzQ+A9" crossorigin=""></script> -->
         <script>
             var map = L.map('map').setView([-8.4095188, 115.188919], 10);
             var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -156,47 +138,48 @@
             }).addTo(map);
 
             var markers = [];
-            var polyline = null;
-            var canAddMarker = true; // Variable to control marker addition
+            var currentPolyline = null;
+            var canAddMarker = true;
             var isOnDrag = false;
-
-            var myIcon = L.icon({
-                iconUrl: 'assets/img/icon_web.png',
-                iconSize: [30, 30],
-                iconAnchor: [20, 40],
-            });
+            var currentRuasId = null;
 
             var ruasJalanDetails = JSON.parse(document.getElementById('ruasJalanDetails').textContent);
             console.log(ruasJalanDetails);
 
-
-            
-            var polycolors = ['red', 'blue', 'green', 'purple', 'orange', 'yellow', 'pink', 'brown', 'black'];
+            var polycolors = ['blue', 'green', 'purple', 'orange', 'yellow', 'pink', 'brown', 'black'];
 
             ruasJalanDetails.forEach(function(ruas, index) {
                 var color = polycolors[index % polycolors.length];
                 var polyline = L.polyline(ruas.paths, {
-                    color: color
+                    color: color,
+                    weight: 6 
                 }).addTo(map);
 
-                
+                var polylineText = L.tooltip({
+                    permanent: true,
+                    direction: 'center',
+                    className: 'kode-ruas-label'
+                })
+                .setContent(ruas.kode_ruas)
+                .setLatLng(polyline.getBounds().getCenter())
+                .addTo(map);
 
                 polyline.on('click', function(e) {
                     console.log(`Polyline ${index + 1} selected`);
-                    var popupContent = `
-                <div class="popup-content">
-                    <p>ID Ruas: ${ruas.id}</p>
-                    <p>Kode Ruas: ${ruas.kode_ruas}</p>
-                    <p>Nama Ruas: ${ruas.nama_ruas}</p>
-                    <p>Panjang: ${ruas.panjang}</p>
-                    <p>Lebar: ${ruas.lebar}</p>
-                    <p>Keterangan: ${ruas.keterangan}</p>
-                </div>
-            `;
-                    L.popup()
-                        .setLatLng(e.latlng)
-                        .setContent(popupContent)
-                        .openOn(map);
+                    // var popupContent = `
+                    //     <div class="popup-content">
+                    //         <p>ID Ruas: ${ruas.id}</p>
+                    //         <p>Kode Ruas: ${ruas.kode_ruas}</p>
+                    //         <p>Nama Ruas: ${ruas.nama_ruas}</p>
+                    //         <p>Panjang: ${ruas.panjang}</p>
+                    //         <p>Lebar: ${ruas.lebar}</p>
+                    //         <p>Keterangan: ${ruas.keterangan}</p>
+                    //     </div>
+                    // `;
+                    // L.popup()
+                    //     .setLatLng(e.latlng)
+                    //     .setContent(popupContent)
+                    //     .openOn(map);
 
                     document.getElementById('id_ruas').value = ruas.id;
                     document.getElementById('paths_get').value = ruas.paths2;
@@ -212,6 +195,17 @@
 
                     currentRuasId = ruas.id;
 
+                    // Remove existing markers and polyline
+                    clearMarkers();
+                    clearPolyline();
+
+                    // Add markers for the clicked polyline
+                    ruas.paths.forEach(function(latlng, i) {
+                        addMarker(latlng, i);
+                    });
+
+                    updatePolyline();
+                    updatePathsInput();
                     updateFormAction();
                 });
             });
@@ -221,41 +215,8 @@
                 form.action = `/ruasjalan/update/${currentRuasId}`;
             }
 
-            
-            function submitForm(method) {
-                var form = document.getElementById('ruasForm');
-                var methodInput = document.getElementById('_method');
-                methodInput.value = method;
-
-                if (method === 'DELETE') {
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "You won't be able to revert this!",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes, delete it!"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.action = `/ruasjalan/delete/${currentRuasId}`;
-                            form.submit();
-                        }
-                    });
-                } else {
-                    form.submit();
-                    Swal.fire({
-                        title: 'Sukses!',
-                        text: 'Form berhasil disimpan',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            }
-
             function addMarker(latlng, index) {
                 var marker = L.marker(latlng, {
-                    // icon: myIcon,
                     draggable: true
                 }).addTo(map);
 
@@ -266,8 +227,7 @@
                 marker.bindPopup(popup);
 
                 marker.on('click', function(event) {
-                    popup.setLatLng(marker.getLatLng()).setContent(formatContent(marker.getLatLng().lat, marker
-                        .getLatLng().lng, index)).openOn(map);
+                    popup.setLatLng(marker.getLatLng()).setContent(formatContent(marker.getLatLng().lat, marker.getLatLng().lng, index)).openOn(map);
                 });
 
                 marker.on('dragstart', function(event) {
@@ -275,8 +235,7 @@
                 });
 
                 marker.on('drag', function(event) {
-                    popup.setLatLng(marker.getLatLng()).setContent(formatContent(marker.getLatLng().lat, marker
-                        .getLatLng().lng, index));
+                    popup.setLatLng(marker.getLatLng()).setContent(formatContent(marker.getLatLng().lat, marker.getLatLng().lng, index));
                 });
 
                 marker.on('dragend', function(event) {
@@ -296,30 +255,47 @@
                 markers.push(marker);
             }
 
-            map.on('click', function(event) {
-                if (canAddMarker) {
-                    var latlng = event.latlng;
-                    addMarker(latlng, markers.length);
-                    updatePolyline();
-                    updatePathsInput();
-                }
-            });
+            function clearMarkers() {
+                markers.forEach(function(marker) {
+                    map.removeLayer(marker);
+                });
+                markers = [];
+            }
 
-            document.getElementById('toggle-add-marker').addEventListener('click', function() {
-                canAddMarker = !canAddMarker;
-                this.textContent = canAddMarker ? 'Off Add Marker' : 'On Add Marker';
-            });
+            function clearPolyline() {
+                if (currentPolyline) {
+                    map.removeLayer(currentPolyline);
+                    currentPolyline = null;
+                }
+            }
 
             function updatePolyline() {
-                if (polyline) {
-                    map.removeLayer(polyline);
-                }
+                clearPolyline();
                 var latLngs = markers.map(function(marker) {
                     return marker.getLatLng();
                 });
-                polyline = L.polyline(latLngs, {
+
+                currentPolyline = L.polyline(latLngs, {
                     color: 'red'
                 }).addTo(map);
+                updatePathsInput();
+            }
+
+            function formatContent(lat, lng, index) {
+                return `<b>Marker ${index + 1}</b><br>
+                    Lat: ${lat.toFixed(5)}<br>
+                    Lng: ${lng.toFixed(5)}<br>
+                    Right click to delete`;
+            }
+
+            function updatePathsInput() {
+                var latLngs = markers.map(function(marker) {
+                    return marker.getLatLng();
+                });
+                var encodedPolyline = encodePolyline(latLngs);
+                document.getElementById('paths_get').value = encodedPolyline;
+                var totalDistance = calculatePolylineDistance(latLngs);
+                document.getElementById('panjang').value = totalDistance.toFixed(2);
             }
 
             function encodePolyline(latlngs) {
@@ -386,46 +362,84 @@
                 return totalDistance;
             }
 
-            function updatePathsInput() {
-                var encodedPolyline = encodePolyline(markers.map(function(marker) {
-                    return marker.getLatLng();
-                }));
-                document.getElementById('paths_get').value = encodedPolyline;
+            function submitForm(method) {
+            var form = document.getElementById('ruasForm');
+            var methodInput = document.getElementById('_method');
+            methodInput.value = method;
 
-                var totalDistance = calculatePolylineDistance(markers.map(function(marker) {
-                    return marker.getLatLng();
-                }));
-                document.getElementById('panjang').value = totalDistance.toFixed(2);
+            if (method === 'DELETE') {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.action = `/ruasjalan/delete/${currentRuasId}`;
+                        form.submit();
+                    }
+                });
+            } else {
+                form.submit();
+                Swal.fire({
+                    title: 'Sukses!',
+                    text: 'Form berhasil disimpan',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
             }
+        }
 
+
+        
             document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('resetMap').addEventListener('click', function() {
                     resetMap();
                 });
+
+                map.on('click', function(event) {
+                    if (!canAddMarker) return;
+                    if (!isOnDrag) {
+                        addMarker(event.latlng, markers.length);
+                        updatePolyline();
+                        updatePathsInput();
+                    }
+                });
+
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Delete' || event.key === 'Backspace') {
+                        deleteSelectedPolyline();
+                    }
+                });
+
+                // Event listener for form submission
+                document.getElementById('ruasForm').addEventListener('submit', function(event) {
+                    event.preventDefault(); // Prevent the default form submission
+
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Berhasil mengedit ruas jalan',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        // Submit the form after the alert is shown
+                        event.target.submit();
+                    });
+                });
             });
 
+
             function resetMap() {
-                markers.forEach(function(marker) {
-                    map.removeLayer(marker);
-                });
-                markers = [];
-                if (polyline) {
-                    map.removeLayer(polyline);
-                    polyline = null;
-                }
+                clearMarkers();
+                clearPolyline();
                 document.getElementById('paths_get').value = "";
                 document.getElementById('id_ruas').value = "";
                 document.getElementById('panjang').value = "";
             }
         </script>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var apiToken = "{{ Session::get('token') }}";
-                console.log('API Token:', apiToken);
-            });
-        </script>
-    </section>
-    </div>
     </section>
 @endsection

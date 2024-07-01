@@ -53,14 +53,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-editable/1.2.0/Leaflet.Editable.min.js"></script>
 
+
+    <!-- Include Leaflet Locate plugin CSS and JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.locatecontrol/0.72.0/L.Control.Locate.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.locatecontrol/0.72.0/L.Control.Locate.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.polylineDecorator@latest/dist/leaflet.polylineDecorator.js"></script>
 </head>
 
 <body id="page-top">
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
         <div class="container">
-            {{-- <a class="navbar-brand" href="#page-top"><img src=" {{ asset('landingpage/assets/img/icon_web.png') }}"
-                    alt="..." />Ruas Jalan Bali</a> --}}
+            <a class="navbar-brand" href="#page-top"><img src=" {{ asset('landingpage/assets/img/icon_web.png') }}"
+                    alt="..." />Ruas Jalan Bali</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
                 aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 Menu

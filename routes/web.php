@@ -61,10 +61,15 @@ Route::get('/add-ruasjalan', [MainController::class, 'showAddRuasJalan']);
 Route::get('/edit-ruasjalan', [MainController::class, 'getRuasJalanForEdit'])->name('getRuasJalanForEdit');
 Route::get('/table-form', [MainController::class, 'getRuasJalanTable']);
 
-Route::put('/ruasjalan/update/{id}', [MainController::class, 'updateRuasJalan'])->name('ruasjalan.update');
+// Route::put('/ruasjalan/update/{id}', [MainController::class, 'updateRuasJalan'])->name('ruasjalan.update');
 Route::delete('/ruasjalan/delete/{id}', [MainController::class, 'deleteRuasJalan'])->name('ruasjalan.delete');;
 Route::post('/submit-ruasjalan', [MainController::class, 'submitRuasJalan'])->name('submitRuasJalan');
 Route::get('/ruasjalan/search', [MainController::class, 'search'])->name('ruasjalan.search');
+
+Route::get('/ruasjalan/edit/{id}', [MainController::class, 'getRuasJalanForEdit'])->name('getRuasJalanForEdit');
+Route::put('/ruasjalan/update/{id}', [MainController::class, 'updateRuasJalan'])->name('ruasjalan.update');
+
+
 
 
 

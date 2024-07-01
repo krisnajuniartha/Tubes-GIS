@@ -7,16 +7,6 @@
     <div class="box-ruas">
         <div class="row mb-3">
             <div class="col">
-                <div class="card text-center">
-                    <div class="card-header">
-                        <i class="fas fa-road"></i> Total ruas jalan
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ count($ruasJalanDetails) }}</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
                 <div class="card text-center text-white bg-danger">
                     <div class="card-header">
                         <i class="fas fa-exclamation-circle"></i> Jalan kondisi rusak
@@ -49,19 +39,28 @@
         </div>
     </div>
 
-    <!-- Form Pencarian -->
+    <!-- Form Pencarian --><div class="search-bar" style="padding-top: 3rem">
     <div class="search-bar" style="padding-top: 3rem">
         <form action="{{ route('ruasjalan.search') }}" method="GET" class="mb-3">
             <div class="row">
-                <div class="col-md-10">
-                    <input type="text" name="search" class="form-control" placeholder="Cari berdasarkan Kode Ruas atau Nama Ruas" value="{{ request('search') }}">
+                <div class="col-md-8">
+                    <input type="text" name="search" class="form-control" placeholder="Cari berdasarkan Kode Ruas, Nama Ruas, Jenis Jalan, Kondisi Jalan, atau Eksisting" value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary">Cari</button>
                 </div>
+                <div class="col-md-2">
+                    <a href="{{ route('ruasjalan.search') }}" class="btn btn-secondary">Semua Jalan</a>
+                </div>
+                <div>
+                    {{-- <a href="{{ route('ruasjalan.create') }}" class="btn btn-success">Tambah</a> --}}
+                </div>
+                <div>
+                    {{-- <a href="{{ route('getRuasJalanForEdit', ['id' => $ruas['id']]) }}" class="btn btn-primary btn-sm">Edit</a> --}}
             </div>
         </form>
     </div>
+        
     
 
     <div class="table-responsive">
@@ -132,7 +131,12 @@
                             @method('DELETE')
                             <button type="button" class="btn btn-danger btn-sm delete-button">Hapus</button>
                         </form>
-                        <a href="{{ route('getRuasJalanForEdit', ['id' => $ruas['id']]) }}" class="btn btn-primary btn-sm">Edit</a>
+                        {{-- <form action="{{ route('ruasjalan.update', ['id' => $ruas['id']]) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <!-- form fields -->
+                            <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                        </form> --}}
                     </td>
                 </tr>
                 @endforeach
